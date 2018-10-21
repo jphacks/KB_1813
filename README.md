@@ -1,6 +1,6 @@
 # ブレスト見せ太郎
 
-[![**ブレスト見せ太郎デモ動画**](BS-Misetaro.png)](https://jphacks.github.io/KB_1813/)
+[![**ブレスト見せ太郎デモ動画**](YoutubeLink.png)](https://www.youtube.com/watch?v=QLONdjclVCw&feature=youtu.be)
 
 [**ブレスト見せ太郎の製品ページへ**](https://jphacks.github.io/KB_1813/)
 
@@ -78,4 +78,5 @@
 
 ### 独自開発技術（Hack Dayで開発したもの）
 #### 2日間に開発した独自の機能・技術
-* 
+* 文章情報からキーワードとなる名詞句を抽出する機能
+**** 音声入力から無向グラフを自動生成する機能
