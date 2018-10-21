@@ -1,0 +1,174 @@
+var pos = 0;				//中心
+var nodesNum = 1;		//ノード数
+var edgeId = 1;			//未割り当てのエッジID
+
+var flag = false;
+document.onkeydown = keydown;
+function keydown() {
+	console.log(event.keyCode);
+	if(event.keyCode == 32 ) vr_function();
+	else if(event.keyCode == 83 ) flag = true;
+}
+
+window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+var recognition = new webkitSpeechRecognition();
+recognition.lang = 'ja';
+recognition.interimResults = true;
+recognition.continuous = true;
+
+var flag_speech = 0;
+function vr_function() {
+	window.SpeechRecognition = window.SpeechRecognition || webkitSpeechRecognition;
+	var recognition = new webkitSpeechRecognition();
+	recognition.lang = 'ja';
+	recognition.interimResults = true;
+	recognition.continuous = true;
+
+	recognition.onsoundstart = function() {
+		document.getElementById('status').innerHTML = "認識中";
+	};
+	recognition.onnomatch = function() {
+		document.getElementById('status').innerHTML = "もう一度試してください";
+	};
+	recognition.onerror = function() {
+		document.getElementById('status').innerHTML = "エラー";
+		if(flag_speech == 0)
+			vr_function();
+	};
+	recognition.onsoundend = function() {
+		document.getElementById('status').innerHTML = "停止中";
+		vr_function();
+	};
+
+	recognition.onresult = function(event) {
+		var results = event.results;
+		console.log(results);
+
+		for (var i = event.resultIndex; i < results.length; i++) {
+			console.log(flag);
+			if(results[i].isFinal || flag )
+			{
+				document.getElementById('result_text').innerHTML = results[i][0].transcript;
+				addNodes(results[i][0].transcript);
+				flag = false;
+				vr_function();
+			}
+			else
+			{
+				document.getElementById('result_text').innerHTML = "[途中経過] " + results[i][0].transcript;
+				flag_speech = 1;
+			}
+		}
+	}
+	flag_speech = 0;
+	document.getElementById('status').innerHTML = "start";
+	recognition.start();
+}
+// create an array with nodes
+var nodes = new vis.DataSet();
+
+// create an array with edges
+var edges = new vis.DataSet();
+
+// create a network
+var container = document.getElementById('mynetwork');
+var data = {
+	nodes: nodes,
+	edges: edges
+};
+var options = {};
+var network = new vis.Network(container, data, options);
+
+network.on("click", function(params) {
+	//console.log(params);
+	//console.log(params.edges);
+	if( params.edges.length == 1 && params.nodes.length == 0 ){
+		edges.remove({id : params.edges[0] });
+	}
+	if (params.nodes.length == 1) {
+		var nodeId = params.nodes[0];
+		var node = nodes.get(nodeId);
+		if( nodeId != pos ){
+			console.log(node.label + 'がクリックされました');
+			if( pos != 0 ){
+				nodes.update({id : pos , group : 1 });
+			}
+			pos = nodeId;
+			let array = checkEdgesNum();
+			for( let i = 1 ; i <= array.length ; i++ ){
+				console.log(i);
+				if( i == pos ) continue;
+				if( array[i] ){
+					edges.add({ id : edgeId , from : pos , to : i });
+					edgeId++;
+				}
+			}
+		}
+		else{
+			nodes.update({ id : pos , group : 1 });
+			pos = 0;
+		}
+	}
+
+	let array = checkEdgesNum();
+	console.log(array);
+	for( let i = 1 ; i <= nodes.length ; i++ ){
+		if( array[i] )
+			nodes.update({ id : i , group : 3 });
+		else
+			nodes.update({ id : i , group : 1});
+	}
+	if( pos > 0 )
+		nodes.update({ id : pos , group : 2 });
+
+	console.log("pos:"+pos+" pos group:"+ nodes );
+});
+
+function checkEdgesNum(){
+	var array = Array(nodes.length+1);
+	array.fill(true);
+	for( let i = 1 ; i <= edgeId ; i++ ){
+		if( edges._data[i] == undefined )
+			continue;
+		array[edges._data[i].from] = false;
+		array[edges._data[i].to] = false;
+	}
+	return array;
+}
+
+
+function addNodes(result){
+	console.log(result);
+	$.ajax({
+		type: 'POST',
+		url: 'https://labs.goo.ne.jp/api/morph',
+		data: {
+			app_id: '83f007948398333edcecf4cbd0def815d86463b74dc4cfb0753f39eb74d348e8',
+			request_id: 'record001',
+			sentence: result,
+			info_filter: 'form|pos',
+			pos_filter: '名詞|Alphabet|Kana|Katakana|Kanji|Roman|Undef'
+		},
+		success: function(json) {
+			var words = json['word_list'][0];
+			if( words != undefined ){
+				console.log(typeof(words));
+				console.log(words);
+				let array = Array(words.length);
+				for( let i = 0 ; i < words.length ; i++ ){
+					array[i] = words[i][0];
+				}
+
+				for( let i = 0 ; i < array.length ; i++ ){
+					console.log(array[i]);
+					nodes.add({ id : nodesNum , label : array[i] , group : 1});
+					if( pos != 0 )
+						edges.add({ id : edgeId , from : pos , to : nodesNum });
+					edgeId++;
+					nodesNum++;
+				}
+				console.log(nodes);
+			}
+		}
+	});
+}
