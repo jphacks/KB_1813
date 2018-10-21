@@ -2,7 +2,7 @@
 <!doctype html>
 <html>
 	<head>
-		<title>Network | Basic usage</title>
+		<title>ブレスト見せ太郎</title>
 
 		<script type="text/javascript" src="vis-4.21.0/dist/vis.js"></script>
 		<script src="https://code.jquery.com/jquery-2.1.4.min.js"></script>
@@ -14,19 +14,32 @@
 	height: 500px;
 	border: 1px solid lightgray;
 }
+#instruction{
+	color : Black;
+	font-size : 50px;
+	text-align: center;
+}
+#result_text{
+	font-family: sans-serif;
+	font-size : 20px;
+}
+#minutes{
+	font-family: sans-serif;
+	font-size : 20px;
+}
 		</style>
 	</head>
 	<body>
 		<div id="mynetwork"></div>
-
 		<script type="text/javascript" src="main.js"></script>
-
-		<textarea id="result_text" cols="100" rows="10">
+		<textarea id="result_text" cols="100" rows="1">
 		</textarea>
 		<br>
-		<textarea id="status" cols="100" rows="1">
+		<textarea id="minutes" cols="100" rows="5">
 		</textarea>
 		<br>
 		<input type="button" onClick="vr_function();" value="音認開始">
+		<br>
+		<div id='instruction'>Press 'Space' or button to Start Recognition!!</div>
 	</body>
 </html>

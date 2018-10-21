@@ -1,8 +1,7 @@
-var pos = 0;				//中心
-var nodesNum = 1;		//ノード数
-var edgeId = 1;			//未割り当てのエッジID
-
-var flag = false;
+var pos = 0;															//中心
+var nodesNum = 1;													//ノード数
+var edgeId = 1;														//未割り当てのエッジID
+var flag = false;													//強制生成
 document.onkeydown = keydown;
 function keydown() {
 	console.log(event.keyCode);
@@ -25,18 +24,18 @@ function vr_function() {
 	recognition.continuous = true;
 
 	recognition.onsoundstart = function() {
-		document.getElementById('status').innerHTML = "認識中";
+		document.getElementById("instruction").innerText = "Recognizing...";
 	};
 	recognition.onnomatch = function() {
-		document.getElementById('status').innerHTML = "もう一度試してください";
+		document.getElementById('instruction').innerText = "Try Again...";
 	};
 	recognition.onerror = function() {
-		document.getElementById('status').innerHTML = "エラー";
+		document.getElementById('instruction').innerText = "Error";
 		if(flag_speech == 0)
 			vr_function();
 	};
 	recognition.onsoundend = function() {
-		document.getElementById('status').innerHTML = "停止中";
+		document.getElementById('instruction').innerText= "Stop";
 		vr_function();
 	};
 
@@ -48,7 +47,16 @@ function vr_function() {
 			console.log(flag);
 			if(results[i].isFinal || flag )
 			{
-				document.getElementById('result_text').innerHTML = results[i][0].transcript;
+				let str = document.getElementById('minutes').value;
+				let DD = new Date();
+				let H = String(DD.getHours());
+				if( H.length == 1 ) H = '0' + H;
+				let M = String(DD.getMinutes());
+				if( M.length == 1 ) M = '0' + M;
+				let S = String(DD.getSeconds());
+				if( S.length == 1 ) S = '0' + S;
+				document.getElementById('minutes').innerHTML =  '[' + H + ':' + M + ':' + S + '] ' +
+				results[i][0].transcript + '\n' + str;
 				addNodes(results[i][0].transcript);
 				flag = false;
 				vr_function();
@@ -61,7 +69,7 @@ function vr_function() {
 		}
 	}
 	flag_speech = 0;
-	document.getElementById('status').innerHTML = "start";
+	document.getElementById("instruction").innerText = "waiting";
 	recognition.start();
 }
 // create an array with nodes
@@ -158,9 +166,9 @@ function addNodes(result){
 				for( let i = 0 ; i < words.length ; i++ ){
 					array[i] = words[i][0];
 				}
-
 				for( let i = 0 ; i < array.length ; i++ ){
 					console.log(array[i]);
+					if( pos != 0 && nodes._data[pos].label == array[i] ) continue;
 					nodes.add({ id : nodesNum , label : array[i] , group : 1});
 					if( pos != 0 )
 						edges.add({ id : edgeId , from : pos , to : nodesNum });
