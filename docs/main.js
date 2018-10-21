@@ -24,7 +24,7 @@ function vr_function() {
 	recognition.continuous = true;
 
 	recognition.onsoundstart = function() {
-		document.getElementById("instruction").innerText = "Recognizing...";
+		document.getElementById("instruction").innerText = "Recognizing...(Press 's' to abort the input )";
 	};
 	recognition.onnomatch = function() {
 		document.getElementById('instruction').innerText = "Try Again...";
