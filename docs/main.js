@@ -155,28 +155,45 @@ function addNodes(result){
 			request_id: 'record001',
 			sentence: result,
 			info_filter: 'form|pos',
-			pos_filter: '名詞|Alphabet|Kana|Katakana|Kanji|Roman|Undef'
 		},
 		success: function(json) {
 			var words = json['word_list'][0];
 			if( words != undefined ){
 				console.log(typeof(words));
 				console.log(words);
-				let array = Array(words.length);
-				for( let i = 0 ; i < words.length ; i++ ){
-					array[i] = words[i][0];
-				}
-				for( let i = 0 ; i < array.length ; i++ ){
-					console.log(array[i]);
-					if( pos != 0 && nodes._data[pos].label == array[i] ) continue;
-					nodes.add({ id : nodesNum , label : array[i] , group : 1});
-					if( pos != 0 )
-						edges.add({ id : edgeId , from : pos , to : nodesNum });
-					edgeId++;
-					nodesNum++;
-				}
-				console.log(nodes);
-			}
-		}
-	});
+
+        var res = new Array(0);
+        var accept = new Array("名詞", "名詞接尾辞", "冠名詞", "Alphabet", "Kana", "Katakana", "Kanji", "Roman", "Undef");
+        for (let i = 0; i < words.length; ++i) {
+          for (let j = 0; j < accept.length; ++j) {
+            if (words[i][1] == accept[j]) res.push(words[i][0]);
+          }
+          if (i > 0 && words[i - 1][1] == '冠名詞' && words[i][1] == '名詞') {
+            var after = res.pop();
+            var before = res.pop();
+            var merged = before + after;
+            res.push(merged);
+          }
+          if (i > 0 && words[i - 1][1] == '名詞' && words[i][1] == '名詞接尾辞') {
+            var after = res.pop();
+            var before = res.pop();
+            var merged = before + after;
+            res.push(merged);
+          }
+        }
+        var array = res;
+
+        for( let i = 0 ; i < array.length ; i++ ){
+          console.log(array[i]);
+          if( pos != 0 && nodes._data[pos].label == array[i] ) continue;
+          nodes.add({ id : nodesNum , label : array[i] , group : 1});
+          if( pos != 0 )
+            edges.add({ id : edgeId , from : pos , to : nodesNum });
+          edgeId++;
+          nodesNum++;
+        }
+        console.log(nodes);
+      }
+    }
+  });
 }
