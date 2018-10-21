@@ -1,6 +1,8 @@
 # ブレスト見せ太郎
 
-[![ブレスト見せ太郎](BS-Misetaro.png)](https://jphacks.github.io/KB_1813/)
+[![**ブレスト見せ太郎デモ動画**](BS-Misetaro.png)](https://jphacks.github.io/KB_1813/)
+
+[**ブレスト見せ太郎の製品ページへ**](https://jphacks.github.io/KB_1813/)
 
 ## 製品概要
 ### ブレインストーミング × Tech
@@ -38,9 +40,6 @@
 #### 3. 特長3
 <!-- リンク情報により話題を可視化 -->
 どの話題を中心にして話しているか可視化する
-
-### 使い方動画
-[![ブレスト見せ太郎の使い方](BS-Misetaro.png)](https://youtu.be/QLONdjclVCw)
 
 #### 使い方補足
 - 入力中に's'を押すと，強制的に入力を打ち切る
